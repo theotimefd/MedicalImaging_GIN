@@ -1,1 +1,1 @@
-# Medical Imaging manipulation
+# Medical Images
