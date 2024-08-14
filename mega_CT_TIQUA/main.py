@@ -30,7 +30,7 @@ import demeter.utils.torchbox as tb
 
 MAIN_DIRECTORY = "/home/fehrdelt/data_ssd/data/FastDiag/"
 TEMP_DIRECTORY = "/home/fehrdelt/data_ssd/data/mega_CT_TIQUA_temp/"
-DATA_DIRECTORY = "/home/fehrdelt/data_ssd/scripts/mega_CT_TIQUA/data/"
+DATA_DIRECTORY = "/home/fehrdelt/data_ssd/MedicalImaging_GIN/mega_CT_TIQUA/data/"
 
 MATLAB_APP_PATH = '/data_network/irmage_pa/_SHARE/DOCKER_CT-TIQUA/docker_light_test/compiled_matlab_scripts/App/application/run_SkullStrip.sh'
 MATLAB_RUNTIME_PATH = '/data_network/irmage_pa/_SHARE/DOCKER_CT-TIQUA/docker_light_test/compiled_matlab_scripts/RunTime/v910'
