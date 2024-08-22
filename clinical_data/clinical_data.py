@@ -225,4 +225,41 @@ def get_clinical_data(filepath):
 
             line_count+=1
     return df
+
+
+def get_clinical_data_outcome(filepath):
+    """
+    Returns a pandas DataFrame containing IPP and the outcome (neurosurgery OR IPC)
+    """
+
+    df_outcome = pd.DataFrame(columns=['IPP', 'neurochir+pic'])
+
+    with open(filepath) as csv_file:
+        
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+
+        for row in csv_reader:
+            
+            if line_count>1:
+
+                ipp = get_IPP(row)
+                if not np.isnan(ipp):
+                    
+                    neurochir = get_neurochir(row)
+                    pic = get_pic(row)
+
+                    combined = int(0)
+
+                    if neurochir==int(1) or pic == int(1):
+                        combined = int(1)
+                    
+                    if np.isnan(neurochir) and np.isnan(pic):
+                        combined = MISSING_VALUE
+                    
+                    df_outcome.loc[len(df_outcome.index)] = [ipp, combined]
+
+            line_count+=1
+    
+    return df_outcome
             

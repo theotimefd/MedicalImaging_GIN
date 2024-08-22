@@ -159,6 +159,8 @@ def Single_Volume_Inference(atlas, seg, Labels, outcsv):
         print("Error")
         print("ATLAS SHAPE")
         print(atlas_h.shape)
+        print("SEG SHAPE")
+        print(seg_h.shape)
         print("PATH")
         print(atlas)
         seg_h = nibabel.processing.conform(from_img=seg_h,out_shape=atlas_h.shape, voxel_size=atlas_h.header.get("pixdim")[1:4], order = 0)

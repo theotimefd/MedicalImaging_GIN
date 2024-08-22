@@ -948,6 +948,25 @@ def imgDeform(I,field,dx_convention ='2square',clamp=True):
     #I = I.to(torch.double)
     #field = field.to(torch.double)
     deformed = F.grid_sample(I,field,**DLT_KW_GRIDSAMPLE)
+    
+    # if len(I.shape) == 5:
+    #     deformed = deformed.permute(0,1,4,3,2)
+    if clamp:
+        max_val = 1 if I.max() <= 1 else 255
+        # print(f"I am clamping max_val = {max_val}, I.max,min = {I.max(),I.min()},")
+        deformed = torch.clamp(deformed,min=0,max=max_val)
+    return deformed
+
+def imgDeform_nearest(I,field,dx_convention ='2square',clamp=True):
+    if I.shape[0] > 1 and field.shape[0] == 1:
+        field = torch.cat(I.shape[0]*[field],dim=0)
+    if dx_convention == 'pixel':
+        field = pixel2square_convention(field)
+    #deformed = F.grid_sample(I,field,**DLT_KW_GRIDSAMPLE)
+    #I = I.to(torch.double)
+    #field = field.to(torch.double)
+    deformed = F.grid_sample(input=I,grid=field,mode="nearest", padding_mode="border", align_corners=True)
+    
     # if len(I.shape) == 5:
     #     deformed = deformed.permute(0,1,4,3,2)
     if clamp:

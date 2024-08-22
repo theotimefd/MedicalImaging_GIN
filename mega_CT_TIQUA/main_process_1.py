@@ -26,11 +26,15 @@ import demeter.utils.reproducing_kernels as rk
 from demeter.utils.constants import *
 import demeter.utils.torchbox as tb
 
+# -------------------------------------------------------
+
+# Process 1 GPU device 1
+
 # ---------------------- CONSTANTS ----------------------
 
-MAIN_DIRECTORY = "/home/fehrdelt/data_ssd/data/FastDiag/"
-TEMP_DIRECTORY = "/home/fehrdelt/data_ssd/data/mega_CT_TIQUA_temp/"
-DATA_DIRECTORY = "/home/fehrdelt/data_ssd/MedicalImaging_GIN/mega_CT_TIQUA/data/"
+MAIN_DIRECTORY = "/home/fehrdelt/data_ssd/data/FastDiag_2_1/"
+TEMP_DIRECTORY = "/home/fehrdelt/data_ssd/data/mega_CT_TIQUA_temp_2_1/"
+DATA_DIRECTORY = "/home/fehrdelt/data_ssd/MedicalImaging_GIN/mega_CT_TIQUA/data_2_1/"
 
 MATLAB_APP_PATH = '/data_network/irmage_pa/_SHARE/DOCKER_CT-TIQUA/docker_light_test/compiled_matlab_scripts/App/application/run_SkullStrip.sh'
 MATLAB_RUNTIME_PATH = '/data_network/irmage_pa/_SHARE/DOCKER_CT-TIQUA/docker_light_test/compiled_matlab_scripts/RunTime/v910'
@@ -38,7 +42,7 @@ MATLAB_RUNTIME_PATH = '/data_network/irmage_pa/_SHARE/DOCKER_CT-TIQUA/docker_lig
 CLAMP_LOW_THRESHOLD = 1.0
 CLAMP_HIGH_THRESHOLD = 80
 
-GPU_DEVICE = 0
+GPU_DEVICE = 1
 
 PIXDIM = [1,1,1]
 
@@ -276,8 +280,8 @@ def LDDMM_registration(basename, brain_extraction_method, device):
     T_tmp = T_smooth
     
 
-    #T_tmp = (T_tmp / T_tmp.max() )
-    #S_tmp = (S_tmp / S_tmp.max() )
+    T_tmp = (T_tmp / T_tmp.max() )
+    S_tmp = (S_tmp / S_tmp.max() )
 
     #T_tmp = histogram_matching(T_tmp, S_tmp)
     
@@ -313,7 +317,7 @@ def LDDMM_registration(basename, brain_extraction_method, device):
 
     print("Apply LDDMM")
     mr_lddmm = mt.lddmm(S,T,residuals,
-        sigma=[1,4],          #  Kernel size
+        sigma=[2,6],          #  Kernel size
         #sigma=(4,4,4),          #  Kernel size
         cost_cst=0.01,         # Regularization parameter
         integration_steps=10,   # Number of integration steps
@@ -324,11 +328,11 @@ def LDDMM_registration(basename, brain_extraction_method, device):
         safe_mode = False,      # Safe mode toggle (does not crash when nan values are encountered)
         integration_method='semiLagrangian',  # You should not use Eulerian for real usage
     )
-    mr_lddmm.plot_cost()
+    #mr_lddmm.plot_cost()
 
     name = source_name
     
-    deformation = mr_lddmm.mp.get_deformation()
+
     deformator = mr_lddmm.mp.get_deformator()
     
     img_deform = tb.imgDeform(S.cpu(), deformator, dx_convention="pixel", clamp=True)
@@ -358,20 +362,11 @@ def LDDMM_registration(basename, brain_extraction_method, device):
     atlasVasc_temp.to(device)
     atlasVasc_temp = atlasVasc_temp.cuda().to(torch.float)
 
-    atlas_deform = tb.imgDeform(atlas_temp.cpu(), deformator, dx_convention="pixel", clamp=True).numpy()[0, 0, :, :, :]
-    atlasVasc_deform = tb.imgDeform(atlasVasc_temp.cpu(), deformator, dx_convention="pixel", clamp=True).numpy()[0, 0, :, :, :]
+    atlas_deform = tb.imgDeform_nearest(atlas_temp.cpu(), deformator, dx_convention="pixel", clamp=True).numpy()[0, 0, :, :, :]
+    atlasVasc_deform = tb.imgDeform_nearest(atlasVasc_temp.cpu(), deformator, dx_convention="pixel", clamp=True).numpy()[0, 0, :, :, :]
     
     atlas_nib = nib.load(TEMP_DIRECTORY+basename+'_'+brain_extraction_method+'_Atlas_FLIRT_hist_match_Registered.nii.gz')
     atlasVasc_nib = nib.load(TEMP_DIRECTORY+basename+'_'+brain_extraction_method+'_AtlasVasc_FLIRT_hist_match_Registered.nii.gz')
-    # The LDDMM deformation actually "smudges" the values of the target -> need to re-quantize the values.
-    orig_atlas_values = np.unique(atlas_nib.get_fdata())
-    orig_atlasVasc_values = np.unique(atlasVasc_nib.get_fdata())
-    
-    for i in range(atlas_deform.shape[0]):
-        for j in range(atlas_deform.shape[1]):
-            for k in range(atlas_deform.shape[2]):
-                atlas_deform[i,j,k] = take_closest(orig_atlas_values, atlas_deform[i,j,k])
-                atlasVasc_deform[i,j,k] = take_closest(orig_atlasVasc_values, atlasVasc_deform[i,j,k])
 
 
     # then upscale the atlases ( !! with nearest interpolation because it's a labelmap !! )
@@ -438,14 +433,21 @@ def process_file(initial_file, device, durations_df):
     
     segmentation_time = segmentation(basename, device)
     
-    extraction_methods = ["TTS", "matlab", "custom_nn"]
+    extraction_methods = ["matlab", "TTS", "custom_nn"]
     registration_methods = ["ANTS", "ANTS_hist_match", "LDDMM"]
 
     for extraction_method in extraction_methods:
         
         start = time.time()
 
-        reference = nib.load(TEMP_DIRECTORY+basename+'_'+extraction_method+'_skullstripped.nii.gz')
+        try:
+            reference = nib.load(TEMP_DIRECTORY+basename+'_'+extraction_method+'_skullstripped.nii.gz')
+        except:
+            print("FILE LOADING ERROR "+extraction_method)
+            broke_quantification_df = pd.DataFrame(columns=["Patient"])
+            broke_quantification_df.loc[len(broke_quantification_df)] = basename
+            broke_quantification_df.to_csv(TEMP_DIRECTORY+basename+"_broke.csv")
+            break
         reference_data = reference.get_fdata()
 
         # values below low_threshold are set to 0 and values over high_threshold are set to high_threshold. Important otherwise the histogram matching won't perform correctly
@@ -463,7 +465,10 @@ def process_file(initial_file, device, durations_df):
         for registration_method in registration_methods:
             volume_computation_time = volume_computation(basename, extraction_method, registration_method)
 
-    durations_df.loc[len(durations_df)] = [basename, brain_extraction_tts_time, brain_extraction_matlab_time, brain_extraction_custom_nn_time, registration_ANTS_time, registration_ANTS_hist_match_time, registration_LDDMM_time, histogram_match_time, volume_computation_time, segmentation_time]
+    try:
+        durations_df.loc[len(durations_df)] = [basename, brain_extraction_tts_time, brain_extraction_matlab_time, brain_extraction_custom_nn_time, registration_ANTS_time, registration_ANTS_hist_match_time, registration_LDDMM_time, histogram_match_time, volume_computation_time, segmentation_time]
+    except:
+        pass
 
     # move all the temp files to a temp subdirectory with the patient number.
     try:
@@ -502,6 +507,9 @@ def run():
     for initial_file in os.listdir(MAIN_DIRECTORY):
 
         if initial_file.endswith(".nii.gz") and not os.path.isdir(TEMP_DIRECTORY+initial_file[:-7]): # prevents from working on file that has already been processed
+
+            print("---------------------")
+            print(f"processing file {initial_file}")
 
             process_file(initial_file, device=device, durations_df=durations_df)
 

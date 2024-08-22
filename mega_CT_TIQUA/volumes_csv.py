@@ -65,47 +65,88 @@ def get_volumes_csv(filepath):
                 
                 if line_count==3: # IPH
                     for region in supratentorial:
-                        patient_volumes['supratentorial_IPH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['supratentorial_IPH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in infratentorial:
-                        patient_volumes['infratentorial_IPH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['infratentorial_IPH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in brainstem:
-                        patient_volumes['brainstem_IPH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['brainstem_IPH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
 
 
                 if line_count==4: # SDH
                     for region in extracerebral:
-                        patient_volumes['extracerebral_SDH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['extracerebral_SDH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
 
                 if line_count==5: # EDH
                     for region in extracerebral:
-                        patient_volumes['extracerebral_EDH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['extracerebral_EDH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
 
                 if line_count==6: # IVH
                     pass
 
                 if line_count==7: # SAH
                     for region in supratentorial:
-                        patient_volumes['supratentorial_SAH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['supratentorial_SAH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in infratentorial:
-                        patient_volumes['infratentorial_SAH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['infratentorial_SAH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in brainstem:
-                        patient_volumes['brainstem_SAH'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['brainstem_SAH'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
 
                 if line_count==8: # Petechiae
                     for region in supratentorial:
-                        patient_volumes['supratentorial_Petechiae'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['supratentorial_Petechiae'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in infratentorial:
-                        patient_volumes['infratentorial_Petechiae'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['infratentorial_Petechiae'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in brainstem:
-                        patient_volumes['brainstem_Petechiae'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['brainstem_Petechiae'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
 
                 if line_count==9: # Edema
                     for region in supratentorial:
-                        patient_volumes['supratentorial_Edema'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['supratentorial_Edema'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in infratentorial:
-                        patient_volumes['infratentorial_Edema'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['infratentorial_Edema'] += int(row[zones_name_row.index(region)])
+                        except:
+                            pass
                     for region in brainstem:
-                        patient_volumes['brainstem_Edema'] += int(row[zones_name_row.index(region)])
+                        try:
+                            patient_volumes['brainstem_Edema'] += int(row[zones_name_row.index(region)])
+                        except:pass
 
 
 
