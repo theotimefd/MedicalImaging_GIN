@@ -24,4 +24,5 @@ This isn't a ready-to use tool but rather the materials to reproduce results fro
 
 
 [1] Wasserthal, J., Breit, H. C., Meyer, M. T., Pradella, M., Hinck, D., Sauter, A. W., ... & Segeroth, M. (2023). TotalSegmentator: robust segmentation of 104 anatomic structures in CT images. Radiology: Artificial Intelligence, 5(5).
+
 [2] Brossard, C., Grèze, J., de Busschère, J. A., Attyé, A., Richard, M., Tornior, F. D., ... & Lemasson, B. (2023). Prediction of therapeutic intensity level from automatic multiclass segmentation of traumatic brain injury lesions on CT-scans. Scientific Reports, 13(1), 20155.
