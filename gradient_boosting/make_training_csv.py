@@ -62,7 +62,7 @@ def get_training_csv(brain_extraction_method, registration_method, output_folder
                                 'infratentorial_SAH', 'infratentorial_Petechiae', 
                                 'infratentorial_Edema', 'brainstem_IPH', 
                                 'brainstem_SAH', 'brainstem_Petechiae', 
-                                'brainstem_Edema','extracerebral_SDH', 'extracerebral_EDH'])
+                                'brainstem_Edema','SDH', 'EDH'])
 
     for file in os.listdir(ct_tiqua_temp_directory):
         if os.path.isdir(ct_tiqua_temp_directory+file) and file[0:2] == "P0" and len(file)==5: # takes only the first image in case 2 were taken the same day: P0016 and P0016a
@@ -91,7 +91,7 @@ def get_training_csv(brain_extraction_method, registration_method, output_folder
                             'infratentorial_SAH', 'infratentorial_Petechiae', 
                             'infratentorial_Edema', 'brainstem_IPH', 
                             'brainstem_SAH', 'brainstem_Petechiae', 
-                            'brainstem_Edema','extracerebral_SDH', 'extracerebral_EDH',
+                            'brainstem_Edema','SDH', 'EDH',
                             'age', 'hemocue_initial', 'fracas_du_bassin', 'catecholamines', 
                                     'pression_arterielle_systolique_PAS_arrivee_du_smur', 
                                     'pression_arterielle_diastolique_PAD_arrivee_du_smur', 
@@ -111,3 +111,25 @@ def get_training_csv(brain_extraction_method, registration_method, output_folder
     print(combined_volumes_clinical_df.head)
 
     combined_volumes_clinical_df.to_csv(os.path.join(output_folder, f"combined_clinical_data_volumes_outcome_{configuration}.csv"))
+
+
+
+def get_ventricle_volume_csv():
+
+    DATA_DIRECTORY = "/home/fehrdelt/data_ssd/mega_CT_TIQUA_temp/"
+    
+    for dir in os.listdir(DATA_DIRECTORY):
+        
+        final_ventricle_volumes = pd.DataFrame(columns=[""])
+
+        if os.path.isdir(DATA_DIRECTORY+dir):
+            try:
+                
+                ventricle_volumes_df = pd.read_csv(DATA_DIRECTORY+dir+"/ventricle_volumes.csv", header=None)
+                
+                final_ventricle_volumes.loc[len(final_ventricle_volumes)] = ventricle_volumes_df
+
+            except:
+                
+                print("Error while trying to read csv")
+

@@ -1,0 +1,15 @@
+Segmentation index,Lesion-region name
+0,supratentorial_IPH
+1,supratentorial_SAH
+2,supratentorial_Petechiae
+3,supratentorial_Edema
+4,infratentorial_IPH
+5,infratentorial_SAH
+6,infratentorial_Petechiae
+7,infratentorial_Edema
+8,brainstem_IPH
+9,brainstem_SAH
+10,brainstem_Petechiae
+11,brainstem_Edema
+12,SDH
+13,EDH
